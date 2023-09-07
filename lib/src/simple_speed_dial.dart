@@ -186,6 +186,7 @@ class _SpeedDialState extends State<SpeedDial>
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: FloatingActionButton(
+                            shape: CircleBorder(),
                             heroTag: speedDialChildAnimationIndex,
                             mini: true,
                             child: speedDialChild.child,
@@ -206,7 +207,11 @@ class _SpeedDialState extends State<SpeedDial>
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: FloatingActionButton(
+            shape: CircleBorder(),
+            child: RotationTransition(
+            turns: _animationController,
             child: widget.child,
+              ),
             foregroundColor: _foregroundColorAnimation.value,
             backgroundColor: _backgroundColorAnimation.value,
             onPressed: () {
