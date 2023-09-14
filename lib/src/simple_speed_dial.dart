@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//prova per vedere se pub get funziona
+
 import 'simple_speed_dial_child.dart';
 
 class SpeedDial extends StatefulWidget {
@@ -70,12 +70,14 @@ class _SpeedDialState extends State<SpeedDial>
   late Animation<Color?> _foregroundColorAnimation;
   final List<Animation<double>> _speedDialChildAnimations =
       <Animation<double>>[];
+  late Animation<double> _jumpAnimation;
+
 
   @override
   void initState() {
     _animationController = widget.controller ??
         AnimationController(
-            vsync: this, duration: const Duration(milliseconds: 450));
+            vsync: this, duration: const Duration(milliseconds: 600));
     _animationController.addListener(() {
       if (mounted) {
         setState(() {});
@@ -126,6 +128,13 @@ class _SpeedDialState extends State<SpeedDial>
           TweenSequence<double>(tweenSequenceItems)
               .animate(_animationController));
     }
+    _jumpAnimation = TweenSequence<double>([
+      TweenSequenceItem<double>(tween: Tween(begin: 0, end: -10), weight: 20),
+      TweenSequenceItem<double>(tween: Tween(begin: -10, end: 0), weight: 20),
+      TweenSequenceItem<double>(tween: Tween(begin: 0, end: -10), weight: 20),
+      TweenSequenceItem<double>(tween: Tween(begin: -10, end: 0), weight: 20),
+    ]).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+
 
     super.initState();
   }
@@ -186,7 +195,7 @@ class _SpeedDialState extends State<SpeedDial>
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: FloatingActionButton(
-                            shape: CircleBorder(),
+                            //shape: CircleBorder(),
                             heroTag: speedDialChildAnimationIndex,
                             mini: true,
                             child: speedDialChild.child,
@@ -207,11 +216,15 @@ class _SpeedDialState extends State<SpeedDial>
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: FloatingActionButton(
-            shape: CircleBorder(),
-            child: RotationTransition(
-            turns: _animationController,
-            child: widget.child,
-              ),
+            child: AnimatedBuilder(
+              animation: _jumpAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, _jumpAnimation.value),
+                  child: widget.child,
+                );
+              },
+            ),
             foregroundColor: _foregroundColorAnimation.value,
             backgroundColor: _backgroundColorAnimation.value,
             onPressed: () {
@@ -223,6 +236,7 @@ class _SpeedDialState extends State<SpeedDial>
             },
           ),
         )
+
       ],
     );
   }
